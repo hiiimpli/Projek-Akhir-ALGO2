@@ -25,7 +25,7 @@ def view_login():
 
     with st.form("login_form"):
         username = st.text_input("Username nya masukin mint")
-        password = st.text_input("Password", type="sekarang password nya mint")
+        password = st.text_input("sekarang password nya mint", type="Password")
         submitted = st.form_submit_button("Login")
 
         if submitted:
