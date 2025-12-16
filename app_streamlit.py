@@ -54,7 +54,7 @@ def is_logged_in():
 def view_login():
     # Logo di halaman login
     try:
-        st.image("logologounpam.png", width=100)
+        st.image("logo_kampus.png", width=100)
     except FileNotFoundError:
         st.warning("Logo file 'logo_kampus.png' not found.")
         
@@ -268,7 +268,7 @@ def main():
 
     # 3. Panggil fungsi background
     # Ganti 'background_image.jpg' dengan nama file background Anda
-    add_bg_from_local('unvvam.jpeg') 
+    add_bg_from_local('background_image.jpg') 
 
     if 'menu' not in st.session_state:
         st.session_state['menu'] = 'data_mahasiswa'
