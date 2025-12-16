@@ -1,11 +1,9 @@
-# app_streamlit.py (VERSI FINAL)
+# app_streamlit.py (VERSI FINAL DENGAN TOMBOL KEMBALI)
 
 import streamlit as st
 import time
 import pandas as pd
 from manajemen import ManajemenData
-
-#cobacoba
 
 # --- Fungsi Utility ---
 def get_manager():
@@ -20,8 +18,10 @@ def is_logged_in():
 
 # --- View: Form Login Sederhana ---
 def view_login():
-    st.title("PORTAL AKADEMIK MAHASISWA UNPAM")
+    st.title("PORTAL AKADEMIK SMDM")
     st.subheader("Login Admin")
+    # st.selectbox yang ditunjukkan di screenshot telah dihilangkan 
+    # untuk menyederhanakan kode login statis.
 
     with st.form("login_form"):
         username = st.text_input("Username")
@@ -29,7 +29,6 @@ def view_login():
         submitted = st.form_submit_button("Login")
 
         if submitted:
-            # --- Metode Login Sederhana (Username dan Password Statis) ---
             if username == "admin" and password == "admin123":
                 st.session_state['logged_in'] = True
                 st.session_state['username'] = username
@@ -41,6 +40,8 @@ def view_login():
 
 # --- View: Form Tambah Data ---
 def view_tambah_data(manager):
+    # TOMBOL KEMBALI
+    st.button("↩️ Kembali ke Dashboard", on_click=lambda: st.session_state.update(menu='data_mahasiswa'), key='back_tambah_data')
     st.header("➕ Input Data Mahasiswa Baru")
     
     with st.form("tambah_form"):
@@ -49,7 +50,6 @@ def view_tambah_data(manager):
         nama = st.text_input("Nama:")
         email = st.text_input("Email:")
         jurusan = st.text_input("Jurusan:")
-        # Gunakan value default agar field tidak kosong saat error muncul
         ipk_str = st.text_input("IPK (0.00 - 4.00):") 
         
         submitted = st.form_submit_button("Simpan Data")
@@ -59,20 +59,23 @@ def view_tambah_data(manager):
                 manager.tambah_data(nim, nama, email, jurusan, ipk_str)
                 st.success(f"✅ Data {nama} berhasil ditambahkan!")
                 time.sleep(1)
-                st.session_state['menu'] = 'dashboard'
+                st.session_state['menu'] = 'data_mahasiswa'
                 st.rerun() 
             except ValueError as e:
                 st.error(f"❌ Kesalahan Validasi: {e}")
 
 # --- View: Form Edit Data ---
 def view_edit_data(manager, nim_to_edit):
+    # TOMBOL KEMBALI
+    st.button("↩️ Kembali ke Dashboard", on_click=lambda: st.session_state.update(menu='data_mahasiswa'), key='back_edit_data')
     st.header(f"✏️ Edit Data Mahasiswa (NIM: {nim_to_edit})")
 
     index = manager.cari_index_nim(nim_to_edit)
     if index == -1:
         st.error("Data tidak ditemukan.")
-        if st.button("Kembali"):
-            st.session_state['menu'] = 'dashboard'
+        # Tombol kembali alternatif jika data tidak ditemukan
+        if st.button("Kembali ke Data Mahasiswa"):
+            st.session_state['menu'] = 'data_mahasiswa'
             st.rerun() 
         return
 
@@ -94,7 +97,6 @@ def view_edit_data(manager, nim_to_edit):
                 email_baru = email if email != mhs.get_email() else None
                 jurusan_baru = jurusan if jurusan != mhs.get_jurusan() else None
                 
-                # Cek IPK: jika nilai string IPK tidak berubah, set None
                 ipk_baru_str = ipk_str
                 if ipk_str and float(ipk_str) == mhs.get_ipk():
                     ipk_baru_str = None
@@ -102,13 +104,13 @@ def view_edit_data(manager, nim_to_edit):
                 manager.edit_data(nim_to_edit, nama_baru, email_baru, jurusan_baru, ipk_baru_str)
                 st.success(f"✅ Data NIM {nim_to_edit} berhasil diubah.")
                 time.sleep(1)
-                st.session_state['menu'] = 'dashboard'
+                st.session_state['menu'] = 'data_mahasiswa'
                 st.rerun() 
             except ValueError as e:
                 st.error(f"❌ Kesalahan Validasi: {e}")
                 
     if st.button("Batalkan Edit"):
-        st.session_state['menu'] = 'dashboard'
+        st.session_state['menu'] = 'data_mahasiswa'
         st.rerun() 
 
 # --- View: Dashboard/Tampil Data ---
@@ -117,12 +119,13 @@ def view_dashboard(manager):
     st.sidebar.title(f"Selamat Datang, {st.session_state['username']}")
     st.sidebar.button("Logout", on_click=lambda: st.session_state.clear(), key='logout_btn')
     
-    # Navigasi Sidebar
+    # Navigasi Sidebar - Mengatur menu yang ditampilkan di main content
     st.sidebar.radio(
         "Navigasi",
         ("Data Mahasiswa", "Input Data", "Kirim Email", "Analisis"),
         index=("Data Mahasiswa", "Input Data", "Kirim Email", "Analisis").index(st.session_state['menu_sidebar']) if 'menu_sidebar' in st.session_state else 0,
         key='menu_sidebar',
+        # Mengubah state menu utama saat sidebar berubah
         on_change=lambda: st.session_state.update(menu=st.session_state['menu_sidebar'].replace(' ', '_').lower())
     )
     
@@ -147,7 +150,6 @@ def view_dashboard(manager):
         
         df = pd.DataFrame(data_dicts)
         
-        # Tambahkan kolom aksi dengan link yang memicu aksi melalui query params
         df['Aksi'] = [
             f"""
             <a target="_self" href="?aksi=edit&nim={mhs.get_nim()}">✏️ Edit</a> | 
@@ -186,9 +188,10 @@ def view_dashboard(manager):
 
 # --- View: Analisis Data (Search & Sort) ---
 def view_analisis(manager):
+    # TOMBOL KEMBALI
+    st.button("↩️ Kembali ke Dashboard", on_click=lambda: st.session_state.update(menu='data_mahasiswa'), key='back_analisis_menu')
     st.header("🔬 Menu Analisis Data: Pencarian & Pengurutan")
     
-    # Tab untuk Search dan Sort
     tab1, tab2 = st.tabs(["Pencarian", "Pengurutan"])
     
     with tab1:
@@ -245,6 +248,8 @@ def view_analisis(manager):
 
 # --- View: Kirim Email ---
 def view_email(manager):
+    # TOMBOL KEMBALI
+    st.button("↩️ Kembali ke Dashboard", on_click=lambda: st.session_state.update(menu='data_mahasiswa'), key='back_email_menu')
     st.header("📧 Kirim Email Data Mahasiswa")
 
     st.warning("""
@@ -266,7 +271,6 @@ def view_email(manager):
                     manager.kirim_email_data(penerima, subjek)
                     st.success("✅ Email berhasil dikirim!")
                 except Exception as e:
-                    # Menangkap kesalahan dari manajemen.py
                     st.error(f"❌ Gagal mengirim email: {e}")
 
 
@@ -285,7 +289,6 @@ def main():
         view_login()
     else:
         # Panggil View sesuai state menu yang aktif
-        # Nama menu di session state harus sesuai dengan opsi di radio button
         if st.session_state['menu'] == 'data_mahasiswa':
             view_dashboard(manager)
         elif st.session_state['menu'] == 'input_data':
