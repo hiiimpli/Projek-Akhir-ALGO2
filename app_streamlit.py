@@ -20,12 +20,12 @@ def is_logged_in():
 
 # --- View: Form Login Sederhana ---
 def view_login():
-    st.title("PORTAL AKADEMIK\nMAHASISWA UNPAM")
+    st.title("PORTAL AKADEMIK MAHASISWA UNPAM")
     st.subheader("Login Admin")
 
     with st.form("login_form"):
-        username = st.text_input("Username nya masukin mint")
-        password = st.text_input("sekarang password nya mint", type="Password")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
         submitted = st.form_submit_button("Login")
 
         if submitted:
@@ -35,20 +35,20 @@ def view_login():
                 st.session_state['username'] = username
                 st.rerun() 
             else:
-                st.error("Username atau Password salah ini mint hadeuh!")
+                st.error("Username atau Password salah!")
         
         st.caption("Gunakan: admin / admin123")
 
 # --- View: Form Tambah Data ---
 def view_tambah_data(manager):
-    st.header("➕ Monggo di Input Data Mahasiswa nya ya!!!")
+    st.header("➕ Input Data Mahasiswa Baru")
     
     with st.form("tambah_form"):
         st.subheader("Detail Mahasiswa")
-        nim = st.text_input("NIM :")
-        nama = st.text_input("Nama :")
-        email = st.text_input("Email :")
-        jurusan = st.text_input("Jurusan :")
+        nim = st.text_input("NIM (12 digit):")
+        nama = st.text_input("Nama:")
+        email = st.text_input("Email:")
+        jurusan = st.text_input("Jurusan:")
         # Gunakan value default agar field tidak kosong saat error muncul
         ipk_str = st.text_input("IPK (0.00 - 4.00):") 
         
@@ -57,12 +57,12 @@ def view_tambah_data(manager):
         if submitted:
             try:
                 manager.tambah_data(nim, nama, email, jurusan, ipk_str)
-                st.success(f"✅ Yesss Data {nama} berhasil ditambahkan!")
+                st.success(f"✅ Data {nama} berhasil ditambahkan!")
                 time.sleep(1)
                 st.session_state['menu'] = 'dashboard'
                 st.rerun() 
             except ValueError as e:
-                st.error(f"❌ Hadeh Ada Kesalahan Validasi nich: {e}")
+                st.error(f"❌ Kesalahan Validasi: {e}")
 
 # --- View: Form Edit Data ---
 def view_edit_data(manager, nim_to_edit):
@@ -114,7 +114,7 @@ def view_edit_data(manager, nim_to_edit):
 # --- View: Dashboard/Tampil Data ---
 def view_dashboard(manager):
     st.header("🎓 Menu Data Mahasiswa")
-    st.sidebar.title(f"Selamat Datang Mint, {st.session_state['username']}")
+    st.sidebar.title(f"Selamat Datang, {st.session_state['username']}")
     st.sidebar.button("Logout", on_click=lambda: st.session_state.clear(), key='logout_btn')
     
     # Navigasi Sidebar
