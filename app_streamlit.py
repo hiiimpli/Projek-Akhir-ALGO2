@@ -5,6 +5,8 @@ import time
 import pandas as pd
 from manajemen import ManajemenData
 
+#cobacoba
+
 # --- Fungsi Utility ---
 def get_manager():
     """Menginisialisasi ManajemenData dan menyimpannya di session_state."""
